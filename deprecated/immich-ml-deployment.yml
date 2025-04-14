@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-machine-learning
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-machine-learning
+  template:
+    metadata:
+      labels:
+        app: immich-machine-learning
+    spec:
+      containers:
+      - name: immich-machine-learning
+        image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+        volumeMounts:
+        - name: model-cache
+          mountPath: "/cache"
+        envFrom:
+        - configMapRef:
+            name: immich-env # Assuming the same .env file as for the immich-server
+      volumes:
+      - name: model-cache
+        hostPath:
+          path: /nfs-data/photos/cache
+          type: DirectoryOrCreate

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-env
+data:
+  # Example environment variables - replace these with the actual ones from your .env file
+  IMMICH_VERSION: "release"
+  UPLOAD_LOCATION: "./library"
+  IMMICH_VERSION: "release"
+  DB_PASSWORD: "postgres"
+
+# The values below this line do not need to be changed
+###################################################################################
+  DB_HOSTNAME: "immich_postgres"
+  DB_USERNAME: "postgres"
+  DB_DATABASE_NAME: "immich"
+
+  REDIS_HOSTNAME: "immich_redis"
+
+
+

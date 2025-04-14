@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-database
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-database
+  template:
+    metadata:
+      labels:
+        app: immich-database
+    spec:
+      containers:
+      - name: immich-database
+        image: registry.hub.docker.com/tensorchord/pgvecto-rs:pg14-v0.2.0
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "postgres" # Use a Secret for real passwords
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "immich"
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: db-data
+      volumes:
+      - name: db-data
+        hostPath:
+          path: /nfs-data/photos/db
+          type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-database
+  namespace: immich
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+  selector:
+    app: immich-database

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-server
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-microservices
+  template:
+    metadata:
+      labels:
+        app: immich-microservices
+    spec:
+      containers:
+      - name: immich-microservices
+        image: ghcr.io/immich-app/immich-server:release
+        command: ["start.sh", "microservices"]  
+        volumeMounts:
+        - name: quicksync
+          mountPath: "dev/dri"
+          readOnly: true
+        - name: photos-storage
+          mountPath: "/usr/src/app/upload"
+        - name: localtime
+          mountPath: "/etc/localtime"
+          readOnly: true
+        envFrom:
+        - configMapRef:
+            name: immich-env
+      volumes:
+      - name: photos-storage
+        hostPath:
+          path: /nfs-data/photos
+          type: DirectoryOrCreate
+      - name: quicksync
+        hostPath:
+          path: /dev/dri
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
